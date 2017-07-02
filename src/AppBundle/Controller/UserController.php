@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\AbstractType;
 
+use AppBundle\Service;
+use AppBundle\Service\serializeTool;
+
 
 
 use AppBundle\Form\Type\UserForm;
@@ -33,15 +36,14 @@ class UserController extends Controller
 
     public function apiAction(){
 
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer()); //zrobic serwis z tego !
+        $serializerService=$this->container->get('app.serialize_tool');
 
-        $serializer = new Serializer($normalizers, $encoders);
+
 
         $em = $this->getDoctrine()->getManager();
 
         $users = $em->getRepository('AppBundle:User')->findAll();
-        $xml=$serializer->serialize($users, 'json');
+        $xml=$serializerService->getSerializer()->serialize($users, 'xml');
         var_dump($xml);
         return new Response("$xml");
 
@@ -52,7 +54,7 @@ class UserController extends Controller
      */
     public function customAction(Request $req,$form){
 
-        $form->handleRequest($req);
+      //  $form->handleRequest($req);
 
         return new Response("raz raz");
     }
